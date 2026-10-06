@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="linen">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulir Notulensi Rapat Organisasi</title>
+  
+  <!-- Tipografi Terkurasi -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Sistem Variabel Warna Organik & Taktil */
+    :root[data-theme="linen"] {
+      --bg-canvas: #F6F5F0;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #EFECE4;
+      --border-line: #E2DDD3;
+      --border-focus: #57534E;
+      --text-heading: #1C1E1D;
+      --text-body: #2B2E2C;
+      --text-dim: #717671;
+      --accent-solid: #2B3A2D;
+      --accent-hover: #1D281F;
+    }
+    :root[data-theme="sage"] {
+      --bg-canvas: #EEF2EE;
+      --bg-surface: #FCFDFC;
+      --bg-subtle: #E3E9E3;
+      --border-line: #CFD9CF;
+      --border-focus: #4A634C;
+      --text-heading: #172018;
+      --text-body: #242E25;
+      --text-dim: #5F6E60;
+      --accent-solid: #26432C;
+      --accent-hover: #182C1D;
+    }
+    :root[data-theme="charcoal"] {
+      --bg-canvas: #131514;
+      --bg-surface: #1B1E1C;
+      --bg-subtle: #242926;
+      --border-line: #2E3531;
+      --border-focus: #7C8881;
+      --text-heading: #F3F5F3;
+      --text-body: #E0E3DF;
+      --text-dim: #8B958F;
+      --accent-solid: #446358;
+      --accent-hover: #324D43;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-body);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+    }
+
+    .ui-surface {
+      background-color: var(--bg-surface);
+      border-color: var(--border-line);
+    }
+    .ui-subtle {
+      background-color: var(--bg-subtle);
+      border-color: var(--border-line);
+    }
+    .ui-input {
+      background-color: transparent;
+      border-color: var(--border-line);
+      color: var(--text-heading);
+      transition: border-color 0.15s ease;
+    }
+    .ui-input:focus {
+      border-color: var(--border-focus);
+      outline: none;
+    }
+    .ui-btn-action {
+      background-color: var(--accent-solid);
+      color: #FFFFFF;
+    }
+    .ui-btn-action:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Watermark / Placeholder Halus */
+    ::placeholder {
+      color: var(--text-dim) !important;
+      opacity: 0.55 !important;
+      font-style: italic !important;
+    }
+
+    /* Standard Dokumen Fisik A4 / Print */
+    @media print {
+      body {
+        background-color: #FFFFFF !important;
+        color: #000000 !important;
+        font-size: 9.5pt !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .ui-surface {
+        background: transparent !important;
+        border: 1px solid #111111 !important;
+        box-shadow: none !important;
+      }
+      .doc-table {
+        border-collapse: collapse !important;
+        width: 100% !important;
+      }
+      .doc-table th, .doc-table td {
+        border: 1px solid #111111 !important;
+        color: #000000 !important;
+        padding: 4px 6px !important;
+      }
+      input, textarea, select {
+        border: none !important;
+        background: transparent !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        resize: none !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased flex flex-col">
+
+  <!-- Navigasi Minimalis (No-Print) -->
+  <header class="no-print sticky top-0 z-30 ui-surface border-b shadow-[0_1px_3px_rgba(0,0,0,0.03)] backdrop-blur-md bg-opacity-95">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+      
+      <!-- Kontrol Berkas Kiri -->
+      <div class="flex items-center gap-2">
+        <button id="btnOpenHistory" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border ui-input text-xs font-semibold hover:border-stone-500 transition-colors">
+          <svg class="w-3.5 h-3.5 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Riwayat
+          <span id="historyBadgeCount" class="px-1.5 py-0.2 rounded font-mono text-[10px] ui-subtle border">0</span>
+        </button>
+
+        <button id="btnNewMeeting" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border ui-input text-xs font-semibold hover:border-stone-500 transition-colors">
+          <svg class="w-3.5 h-3.5 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Notulen Baru
+        </button>
+      </div>
+
+      <!-- Tindakan Kanan -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Switcher Tema Tenang -->
+        <div class="hidden sm:flex items-center p-0.5 rounded-md border ui-subtle text-xs">
+          <button data-theme-val="linen" class="theme-btn px-2.5 py-1 rounded text-xs font-medium transition-all">Linen</button>
+          <button data-theme-val="sage" class="theme-btn px-2.5 py-1 rounded text-xs font-medium transition-all">Sage</button>
+          <button data-theme-val="charcoal" class="theme-btn px-2.5 py-1 rounded text-xs font-medium transition-all">Charcoal</button>
+        </div>
+
+        <button id="btnCopyWA" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-stone-800 hover:bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 text-xs font-semibold shadow-xs transition-colors">
+          <svg class="w-3.5 h-3.5 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+          Salin WA
+        </button>
+
+        <button id="btnPrintPDF" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md ui-btn-action text-xs font-semibold shadow-xs transition-colors">
+          <svg class="w-3.5 h-3.5 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          Cetak PDF
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Status Metadata Sub-Header -->
+    <div class="border-t ui-subtle px-4 sm:px-6 py-1.5 text-[11px] flex items-center justify-between">
+      <div class="flex items-center gap-2 font-mono">
+        <span id="currentMeetingBadge" class="font-medium tracking-tight truncate max-w-[280px] sm:max-w-md">FORMULIR NOTULENSI RAPAT</span>
+        <span class="opacity-30">|</span>
+        <span id="saveStatus" class="opacity-60 text-[10px]">Tersimpan di perangkat</span>
+      </div>
+      <button id="btnDuplicateCurrent" class="font-mono text-[11px] opacity-70 hover:opacity-100 underline decoration-dotted">Duplikat Berkas</button>
+    </div>
+  </header>
+
+  <!-- Konten Dokumen Utama -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 print-wrapper">
+    
+    <div class="ui-surface border rounded-lg p-6 sm:p-10 shadow-[0_1px_4px_rgba(0,0,0,0.04)] space-y-8">
+
+      <!-- Header Dokumen / KOP Resmi -->
+      <div class="border-b pb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="w-36 h-12 border border-dashed rounded flex items-center justify-center text-[10px] font-mono tracking-widest opacity-50 uppercase">
+          LOGO ORGANISASI
+        </div>
+        <div class="text-center sm:text-right space-y-0.5">
+          <h1 class="text-base sm:text-lg font-bold font-mono tracking-wider uppercase">FORMULIR NOTULENSI RAPAT</h1>
+          <p class="text-[11px] font-mono opacity-60 tracking-tight">STANDAR DOKUMENTASI & TATA KELOLA KEPUTUSAN</p>
+        </div>
+      </div>
+
+      <!-- A // IDENTITAS RAPAT -->
+      <section class="space-y-4">
+        <div class="flex items-center gap-2 border-b pb-2">
+          <span class="font-mono text-xs font-semibold tracking-wider opacity-60">A //</span>
+          <h2 class="font-mono text-xs font-bold uppercase tracking-wider">IDENTITAS RAPAT</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-medium mb-1 opacity-70 text-[11px]">Unit / Bagian</label>
+            <input type="text" id="inpUnit" class="ui-input w-full px-3 py-2 rounded border" placeholder="Nama unit atau departemen...">
+          </div>
+
+          <!-- Hari & Tanggal -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block font-medium opacity-70 text-[11px]">Hari / Tanggal</label>
+              <button type="button" id="btnDateToday" class="no-print font-mono text-[10px] opacity-60 hover:opacity-100 underline">Set Hari Ini</button>
+            </div>
+            <div class="flex gap-2">
+              <input type="date" id="pickerDate" class="ui-input px-2.5 py-1.5 rounded border font-mono text-xs no-print w-36">
+              <input type="text" id="inpDate" class="ui-input flex-1 px-3 py-2 rounded border font-mono" placeholder="Pilih kalender atau ketik manual...">
+            </div>
+          </div>
+
+          <!-- Pemilih Waktu Pelaksanaan -->
+          <div class="sm:col-span-2 p-3.5 rounded border ui-subtle space-y-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <label class="block font-medium text-[11px] opacity-75">Waktu Pelaksanaan (Mulai s.d. Selesai)</label>
+              <div class="no-print flex items-center gap-1.5 text-[10px] font-mono">
+                <span class="opacity-50">Durasi:</span>
+                <button type="button" class="btn-quick-dur px-2 py-0.5 rounded border ui-input hover:border-stone-500" data-dur="30">+30m</button>
+                <button type="button" class="btn-quick-dur px-2 py-0.5 rounded border ui-input hover:border-stone-500" data-dur="60">+1j</button>
+                <button type="button" class="btn-quick-dur px-2 py-0.5 rounded border ui-input hover:border-stone-500" data-dur="120">+2j</button>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex items-center gap-1.5 no-print">
+                <span class="text-[10px] font-mono opacity-60">Mulai</span>
+                <input type="time" id="timeStart" value="09:00" class="ui-input px-2 py-1 rounded border font-mono text-xs">
+              </div>
+
+              <span class="opacity-40 text-xs no-print font-mono">s.d.</span>
+
+              <div class="flex items-center gap-1.5 no-print">
+                <span class="text-[10px] font-mono opacity-60">Selesai</span>
+                <input type="time" id="timeEnd" value="11:00" class="ui-input px-2 py-1 rounded border font-mono text-xs">
+              </div>
+
+              <select id="timeZone" class="ui-input px-2 py-1 rounded border font-mono text-xs no-print font-medium">
+                <option value="WIB">WIB</option>
+                <option value="WITA">WITA</option>
+                <option value="WIT">WIT</option>
+              </select>
+
+              <input type="text" id="inpTime" class="ui-input flex-1 min-w-[220px] px-3 py-1.5 rounded border font-mono text-xs" placeholder="Hasil jam gabungan otomatis...">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1 opacity-70 text-[11px]">Tempat / Media</label>
+            <input type="text" id="inpMedia" class="ui-input w-full px-3 py-2 rounded border" placeholder="Ruang Rapat Utama / Google Meet...">
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1 opacity-70 text-[11px]">Agenda / Tujuan</label>
+            <input type="text" id="inpAgenda" class="ui-input w-full px-3 py-2 rounded border" placeholder="Tujuan atau agenda pokok rapat...">
+          </div>
+
+          <div>
+            <label class="block font-medium mb-1 opacity-70 text-[11px]">Pimpinan Rapat</label>
+            <input type="text" id="inpLead" class="ui-input w-full px-3 py-2 rounded border" placeholder="Nama fasilitator atau pimpinan...">
+          </div>
+          <div>
+            <label class="block font-medium mb-1 opacity-70 text-[11px]">Notulis</label>
+            <input type="text" id="inpNotetaker" class="ui-input w-full px-3 py-2 rounded border" placeholder="Nama pencatat dokumen...">
+          </div>
+
+          <!-- Radio Jenis Rapat & Rujukan -->
+          <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t">
+            <div>
+              <label class="block font-medium mb-2 opacity-70 text-[11px]">Jenis Rapat</label>
+              <div class="flex items-center gap-5 text-xs">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="jenisRapat" value="Rutin" checked class="accent-stone-700">
+                  <span>Rutin</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="jenisRapat" value="Khusus" class="accent-stone-700">
+                  <span>Khusus</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="jenisRapat" value="Tindak Lanjut" class="accent-stone-700">
+                  <span>Tindak Lanjut</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-medium mb-2 opacity-70 text-[11px]">Rapat Sebelumnya</label>
+              <div class="flex items-center gap-3">
+                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs">
+                  <input type="radio" name="prevMeeting" value="Ada" class="accent-stone-700">
+                  <span>Ada</span>
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs">
+                  <input type="radio" name="prevMeeting" value="Tidak Ada" checked class="accent-stone-700">
+                  <span>Tidak Ada</span>
+                </label>
+                <input type="text" id="inpPrevRef" class="ui-input flex-1 px-2.5 py-1 text-xs rounded border font-mono" placeholder="Nomor referensi / tanggal rapat sebelumnya...">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- B // PESERTA RAPAT -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b pb-2">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs font-semibold tracking-wider opacity-60">B //</span>
+            <h2 class="font-mono text-xs font-bold uppercase tracking-wider">PESERTA RAPAT</h2>
+          </div>
+          <button id="btnAddParticipant" class="no-print font-mono text-[11px] font-semibold px-2.5 py-1 rounded border ui-input hover:border-stone-500">
+            + Tambah Baris
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse doc-table border">
+            <thead>
+              <tr class="ui-subtle font-mono text-[11px] border-b">
+                <th class="py-2 px-2.5 w-10 text-center border-r font-medium opacity-70">No.</th>
+                <th class="py-2 px-3 border-r font-medium opacity-70">Nama Peserta</th>
+                <th class="py-2 px-3 border-r font-medium opacity-70">Jabatan / Unit</th>
+                <th class="py-2 px-3 w-36 border-r font-medium opacity-70">Kehadiran</th>
+                <th class="py-2 px-1 w-8 text-center no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyParticipants" class="divide-y"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- C // POKOK PEMBAHASAN -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b pb-2">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs font-semibold tracking-wider opacity-60">C //</span>
+            <h2 class="font-mono text-xs font-bold uppercase tracking-wider">POKOK PEMBAHASAN</h2>
+          </div>
+          <button id="btnAddTopic" class="no-print font-mono text-[11px] font-semibold px-2.5 py-1 rounded border ui-input hover:border-stone-500">
+            + Tambah Topik
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse doc-table border">
+            <thead>
+              <tr class="ui-subtle font-mono text-[11px] border-b">
+                <th class="py-2 px-2.5 w-10 text-center border-r font-medium opacity-70">No.</th>
+                <th class="py-2 px-3 w-1/3 border-r font-medium opacity-70">Topik / Pokok Masalah</th>
+                <th class="py-2 px-3 border-r font-medium opacity-70">Ringkasan Pembahasan</th>
+                <th class="py-2 px-1 w-8 text-center no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyTopics" class="divide-y"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- D // KEPUTUSAN / KESEPAKATAN -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b pb-2">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs font-semibold tracking-wider opacity-60">D //</span>
+            <h2 class="font-mono text-xs font-bold uppercase tracking-wider">KEPUTUSAN / KESEPAKATAN</h2>
+          </div>
+          <button id="btnAddDecision" class="no-print font-mono text-[11px] font-semibold px-2.5 py-1 rounded border ui-input hover:border-stone-500">
+            + Tambah Keputusan
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse doc-table border">
+            <thead>
+              <tr class="ui-subtle font-mono text-[11px] border-b">
+                <th class="py-2 px-2.5 w-10 text-center border-r font-medium opacity-70">No.</th>
+                <th class="py-2 px-3 border-r font-medium opacity-70">Uraian Keputusan / Kesepakatan Final</th>
+                <th class="py-2 px-1 w-8 text-center no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyDecisions" class="divide-y"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Pemisah Halaman Cetak -->
+      <div class="page-break my-4"></div>
+
+      <!-- E // TINDAK LANJUT / ACTION PLAN -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b pb-2">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs font-semibold tracking-wider opacity-60">E //</span>
+            <h2 class="font-mono text-xs font-bold uppercase tracking-wider">TINDAK LANJUT (ACTION PLAN)</h2>
+          </div>
+          <button id="btnAddAction" class="no-print font-mono text-[11px] font-semibold px-2.5 py-1 rounded border ui-input hover:border-stone-500">
+            + Tambah Tindakan
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse doc-table border">
+            <thead>
+              <tr class="ui-subtle font-mono text-[11px] border-b">
+                <th class="py-2 px-2 text-center w-8 border-r font-medium opacity-70">No.</th>
+                <th class="py-2 px-2.5 border-r font-medium opacity-70">Tindakan yang Harus Dilakukan</th>
+                <th class="py-2 px-2.5 w-28 border-r font-medium opacity-70">PIC</th>
+                <th class="py-2 px-2 w-24 border-r font-medium opacity-70">Target Selesai</th>
+                <th class="py-2 px-2 w-28 border-r text-center font-medium opacity-70">Status</th>
+                <th class="py-2 px-2.5 w-32 border-r font-medium opacity-70">Bukti / Referensi</th>
+                <th class="py-2 px-1 w-6 text-center no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyActions" class="divide-y"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- F // ISU / RISIKO / HAMBATAN -->
+      <section class="space-y-3">
+        <div class="flex items-center gap-2 border-b pb-2">
+          <span class="font-mono text-xs font-semibold tracking-wider opacity-60">F //</span>
+          <h2 class="font-mono text-xs font-bold uppercase tracking-wider">ISU / RISIKO / HAMBATAN</h2>
+        </div>
+        <textarea id="inpIssues" rows="3" class="ui-input w-full p-3 text-xs rounded border" placeholder="Catat potensi risiko teknis, ketergantungan antar tim, atau kendala operasional yang perlu dimitigasi..."></textarea>
+      </section>
+
+      <!-- G // DOKUMEN / BUKTI PENDUKUNG -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between border-b pb-2">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs font-semibold tracking-wider opacity-60">G //</span>
+            <h2 class="font-mono text-xs font-bold uppercase tracking-wider">DOKUMEN / BUKTI PENDUKUNG</h2>
+          </div>
+          <button id="btnAddDoc" class="no-print font-mono text-[11px] font-semibold px-2.5 py-1 rounded border ui-input hover:border-stone-500">
+            + Tambah Dokumen
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse doc-table border">
+            <thead>
+              <tr class="ui-subtle font-mono text-[11px] border-b">
+                <th class="py-2 px-2.5 w-10 text-center border-r font-medium opacity-70">No.</th>
+                <th class="py-2 px-3 border-r font-medium opacity-70">Nama Dokumen / Berkas</th>
+                <th class="py-2 px-3 border-r font-medium opacity-70">Lokasi / Keterangan</th>
+                <th class="py-2 px-1 w-8 text-center no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyDocs" class="divide-y"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- H // PENGESAHAN RESMI -->
+      <section class="space-y-3 pt-2">
+        <div class="flex items-center gap-2 border-b pb-2">
+          <span class="font-mono text-xs font-semibold tracking-wider opacity-60">H //</span>
+          <h2 class="font-mono text-xs font-bold uppercase tracking-wider">PENGESAHAN</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border p-4 rounded">
+          <!-- Pimpinan Rapat -->
+          <div class="space-y-3">
+            <h3 class="font-bold text-xs uppercase font-mono border-b pb-1 opacity-80">Pimpinan Rapat</h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="w-20 opacity-60 text-[11px]">Nama:</span>
+                <input type="text" id="signLeadName" class="ui-input flex-1 px-2.5 py-1 rounded border text-xs" placeholder="Nama pimpinan...">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-20 opacity-60 text-[11px]">Jabatan:</span>
+                <input type="text" id="signLeadRole" class="ui-input flex-1 px-2.5 py-1 rounded border text-xs" placeholder="Jabatan...">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-20 opacity-60 text-[11px]">Tgl/Ttd:</span>
+                <input type="text" id="signLeadDate" class="ui-input flex-1 px-2.5 py-1 rounded border text-xs font-mono" placeholder="Tanggal validasi...">
+              </div>
+            </div>
+            <div class="h-14 border border-dashed rounded flex items-center justify-center text-[10px] font-mono opacity-40">
+              (Ruang Tanda Tangan)
+            </div>
+          </div>
+
+          <!-- Notulis -->
+          <div class="space-y-3">
+            <h3 class="font-bold text-xs uppercase font-mono border-b pb-1 opacity-80">Notulis</h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="w-20 opacity-60 text-[11px]">Nama:</span>
+                <input type="text" id="signNoteName" class="ui-input flex-1 px-2.5 py-1 rounded border text-xs" placeholder="Nama notulis...">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-20 opacity-60 text-[11px]">Jabatan:</span>
+                <input type="text" id="signNoteRole" class="ui-input flex-1 px-2.5 py-1 rounded border text-xs" placeholder="Jabatan...">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-20 opacity-60 text-[11px]">Tgl/Ttd:</span>
+                <input type="text" id="signNoteDate" class="ui-input flex-1 px-2.5 py-1 rounded border text-xs font-mono" placeholder="Tanggal validasi...">
+              </div>
+            </div>
+            <div class="h-14 border border-dashed rounded flex items-center justify-center text-[10px] font-mono opacity-40">
+              (Ruang Tanda Tangan)
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer Standar Kendali Dokumen -->
+      <footer class="pt-4 border-t text-center font-mono text-[9px] tracking-wider opacity-60 uppercase">
+        DOKUMEN TERKENDALI | Pastikan menggunakan versi/revisi terbaru | Dilarang mengubah tanpa persetujuan
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- Slide-Over Drawer: Riwayat Arsip Notulensi -->
+  <div id="drawerOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-xs z-40 hidden transition-opacity"></div>
+  <aside id="historyDrawer" class="fixed top-0 right-0 w-full sm:w-96 h-full ui-surface border-l z-50 transform translate-x-full transition-transform duration-200 flex flex-col shadow-xl">
+    <div class="p-4 border-b ui-subtle flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <svg class="w-4 h-4 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <span class="font-mono text-xs font-bold uppercase tracking-wider">Arsip Notulensi</span>
+      </div>
+      <button id="btnCloseDrawer" class="p-1 rounded hover:bg-stone-200/50 dark:hover:bg-stone-800">
+        <svg class="w-4 h-4 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-3 border-b">
+      <input type="text" id="inpSearchHistory" class="ui-input w-full px-3 py-1.5 text-xs rounded border" placeholder="Cari agenda, unit, atau tanggal...">
+    </div>
+
+    <div id="historyListContainer" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+
+    <div class="p-3 border-t ui-subtle flex items-center justify-between text-xs font-mono">
+      <span id="historyTotalCount" class="opacity-70 text-[11px]">0 berkas tersimpan</span>
+      <button id="btnDrawerNew" class="px-2.5 py-1 rounded bg-stone-800 text-white dark:bg-stone-200 dark:text-stone-900 text-[10px] font-semibold">+ Buat Baru</button>
+    </div>
+  </aside>
+
+  <!-- Notifikasi Mini (Toast) -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 pointer-events-none transition-all duration-200 bg-stone-900 text-stone-100 text-xs px-3.5 py-2 rounded shadow-lg flex items-center gap-2 font-mono">
+    <span id="toastMsg">Tersalin ke clipboard</span>
+  </div>
+
+  <!-- Logika Aplikasi (JavaScript) -->
+  <script>
+    const STORAGE_KEY = 'notulen_editorial_db_v1';
+    const CURRENT_ID_KEY = 'notulen_editorial_current_id';
+    const THEME_KEY = 'notulen_editorial_theme';
+
+    let meetings = [];
+    let currentId = null;
+
+    function formatIndonesianDate(d) {
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      return `${days[d.getDay()]}, ${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function createBlankNotulensi() {
+      const now = new Date();
+      const formattedDate = formatIndonesianDate(now);
+
+      return {
+        id: 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        unit: '',
+        date: formattedDate,
+        dateIso: now.toISOString().split('T')[0],
+        timeStart: '09:00',
+        timeEnd: '11:00',
+        timeZone: 'WIB',
+        time: '09.00 s.d. 11.00 WIB',
+        media: '',
+        agenda: '',
+        lead: '',
+        notetaker: '',
+        jenisRapat: 'Rutin',
+        prevMeeting: 'Tidak Ada',
+        prevRef: '',
+        participants: [
+          { nama: '', jabatan: '', status: 'Hadir' },
+          { nama: '', jabatan: '', status: 'Hadir' }
+        ],
+        topics: [
+          { issue: '', detail: '' }
+        ],
+        decisions: [
+          ''
+        ],
+        actions: [
+          { task: '', pic: '', target: '', status: 'Belum Mulai', ref: '' }
+        ],
+        issues: '',
+        documents: [
+          { name: '', note: '' }
+        ],
+        signLead: { name: '', role: '', date: formattedDate },
+        signNote: { name: '', role: '', date: formattedDate },
+        updatedAt: Date.now()
+      };
+    }
+
+    function init() {
+      const savedTheme = localStorage.getItem(THEME_KEY) || 'linen';
+      setTheme(savedTheme);
+
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) meetings = JSON.parse(stored);
+      } catch (e) {
+        console.error(e);
+      }
+
+      if (!Array.isArray(meetings) || meetings.length === 0) {
+        const first = createBlankNotulensi();
+        meetings = [first];
+        currentId = first.id;
+        save();
+      } else {
+        const lastId = localStorage.getItem(CURRENT_ID_KEY);
+        const match = meetings.find(m => m.id === lastId);
+        currentId = match ? match.id : meetings[0].id;
+      }
+
+      render();
+      renderHistory();
+    }
+
+    function cur() {
+      return meetings.find(m => m.id === currentId) || meetings[0];
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(meetings));
+      localStorage.setItem(CURRENT_ID_KEY, currentId);
+      updateHeader();
+    }
+
+    function updateHeader() {
+      const doc = cur();
+      const badge = document.getElementById('currentMeetingBadge');
+      if (badge && doc) {
+        badge.textContent = `${doc.agenda ? doc.agenda.toUpperCase() : 'FORMULIR NOTULENSI'} — ${doc.date || ''}`;
+      }
+      document.getElementById('historyBadgeCount').textContent = meetings.length;
+      document.getElementById('historyTotalCount').textContent = `${meetings.length} berkas tersimpan`;
+    }
+
+    function render() {
+      const d = cur();
+      if (!d) return;
+
+      document.getElementById('inpUnit').value = d.unit || '';
+      document.getElementById('inpDate').value = d.date || '';
+      document.getElementById('pickerDate').value = d.dateIso || '';
+      document.getElementById('timeStart').value = d.timeStart || '09:00';
+      document.getElementById('timeEnd').value = d.timeEnd || '11:00';
+      document.getElementById('timeZone').value = d.timeZone || 'WIB';
+      document.getElementById('inpTime').value = d.time || `${d.timeStart || '09:00'} s.d. ${d.timeEnd || '11:00'} ${d.timeZone || 'WIB'}`;
+
+      document.getElementById('inpMedia').value = d.media || '';
+      document.getElementById('inpAgenda').value = d.agenda || '';
+      document.getElementById('inpLead').value = d.lead || '';
+      document.getElementById('inpNotetaker').value = d.notetaker || '';
+      document.getElementById('inpPrevRef').value = d.prevRef || '';
+      document.getElementById('inpIssues').value = d.issues || '';
+
+      document.querySelectorAll('input[name="jenisRapat"]').forEach(r => {
+        r.checked = r.value === d.jenisRapat;
+      });
+      document.querySelectorAll('input[name="prevMeeting"]').forEach(r => {
+        r.checked = r.value === d.prevMeeting;
+      });
+
+      document.getElementById('signLeadName').value = d.signLead ? d.signLead.name : '';
+      document.getElementById('signLeadRole').value = d.signLead ? d.signLead.role : '';
+      document.getElementById('signLeadDate').value = d.signLead ? d.signLead.date : '';
+      document.getElementById('signNoteName').value = d.signNote ? d.signNote.name : '';
+      document.getElementById('signNoteRole').value = d.signNote ? d.signNote.role : '';
+      document.getElementById('signNoteDate').value = d.signNote ? d.signNote.date : '';
+
+      renderParticipantsTable();
+      renderTopicsTable();
+      renderDecisionsTable();
+      renderActionsTable();
+      renderDocsTable();
+      updateHeader();
+    }
+
+    function updateCombinedTime() {
+      const start = document.getElementById('timeStart').value;
+      const end = document.getElementById('timeEnd').value;
+      const zone = document.getElementById('timeZone').value;
+      const combined = `${start.replace(':', '.')} s.d. ${end.replace(':', '.')} ${zone}`;
+      document.getElementById('inpTime').value = combined;
+      cur().timeStart = start;
+      cur().timeEnd = end;
+      cur().timeZone = zone;
+      cur().time = combined;
+      save();
+    }
+
+    function renderParticipantsTable() {
+      const tbody = document.getElementById('tbodyParticipants');
+      tbody.innerHTML = '';
+      (cur().participants || []).forEach((p, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-black/[0.015] dark:hover:bg-white/[0.015]';
+        tr.innerHTML = `
+          <td class="py-1 px-2 text-center font-mono opacity-50 border-r">${idx + 1}</td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="part-name ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(p.nama)}" placeholder="Nama peserta..."></td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="part-role ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(p.jabatan)}" placeholder="Jabatan / unit..."></td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="part-status ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(p.status)}" placeholder="Hadir / Izin..."></td>
+          <td class="py-1 px-1 text-center no-print"><button data-idx="${idx}" class="btn-del-part text-stone-400 hover:text-rose-600 font-mono text-sm px-1">×</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderTopicsTable() {
+      const tbody = document.getElementById('tbodyTopics');
+      tbody.innerHTML = '';
+      (cur().topics || []).forEach((t, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-black/[0.015] dark:hover:bg-white/[0.015]';
+        tr.innerHTML = `
+          <td class="py-1 px-2 text-center font-mono opacity-50 border-r">${idx + 1}</td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="topic-issue ui-input w-full px-2 py-1 rounded border text-xs font-medium" value="${escapeHtml(t.issue)}" placeholder="Topik masalah..."></td>
+          <td class="py-1 px-2 border-r"><textarea data-idx="${idx}" rows="1" class="topic-detail ui-input w-full px-2 py-1 rounded border text-xs" placeholder="Ringkasan pembahasan...">${escapeHtml(t.detail)}</textarea></td>
+          <td class="py-1 px-1 text-center no-print"><button data-idx="${idx}" class="btn-del-topic text-stone-400 hover:text-rose-600 font-mono text-sm px-1">×</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderDecisionsTable() {
+      const tbody = document.getElementById('tbodyDecisions');
+      tbody.innerHTML = '';
+      (cur().decisions || []).forEach((dec, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-black/[0.015] dark:hover:bg-white/[0.015]';
+        tr.innerHTML = `
+          <td class="py-1 px-2 text-center font-mono opacity-50 border-r">${idx + 1}</td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="dec-text ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(dec)}" placeholder="Poin keputusan final..."></td>
+          <td class="py-1 px-1 text-center no-print"><button data-idx="${idx}" class="btn-del-dec text-stone-400 hover:text-rose-600 font-mono text-sm px-1">×</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderActionsTable() {
+      const tbody = document.getElementById('tbodyActions');
+      tbody.innerHTML = '';
+      (cur().actions || []).forEach((a, idx) => {
+        let badgeColor = 'bg-stone-200 text-stone-700 dark:bg-stone-800 dark:text-stone-300';
+        if (a.status === 'Selesai') badgeColor = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300';
+        if (a.status === 'Proses') badgeColor = 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300';
+        if (a.status === 'Ditunda') badgeColor = 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300';
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-black/[0.015] dark:hover:bg-white/[0.015]';
+        tr.innerHTML = `
+          <td class="py-1 px-2 text-center font-mono opacity-50 border-r">${idx + 1}</td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="act-task ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(a.task)}" placeholder="Tindakan..."></td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="act-pic ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(a.pic)}" placeholder="PIC..."></td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="act-target ui-input w-full px-2 py-1 rounded border font-mono text-xs" value="${escapeHtml(a.target)}" placeholder="Target..."></td>
+          <td class="py-1 px-1.5 border-r text-center">
+            <select data-idx="${idx}" class="act-status ui-input w-full px-1 py-1 text-[11px] font-mono rounded border font-medium ${badgeColor}">
+              <option value="Belum Mulai" ${a.status === 'Belum Mulai' ? 'selected' : ''}>Belum Mulai</option>
+              <option value="Proses" ${a.status === 'Proses' ? 'selected' : ''}>Proses</option>
+              <option value="Selesai" ${a.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+              <option value="Ditunda" ${a.status === 'Ditunda' ? 'selected' : ''}>Ditunda</option>
+            </select>
+          </td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="act-ref ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(a.ref)}" placeholder="Bukti / Ref..."></td>
+          <td class="py-1 px-1 text-center no-print"><button data-idx="${idx}" class="btn-del-act text-stone-400 hover:text-rose-600 font-mono text-sm px-1">×</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderDocsTable() {
+      const tbody = document.getElementById('tbodyDocs');
+      tbody.innerHTML = '';
+      (cur().documents || []).forEach((doc, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-black/[0.015] dark:hover:bg-white/[0.015]';
+        tr.innerHTML = `
+          <td class="py-1 px-2 text-center font-mono opacity-50 border-r">${idx + 1}</td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="doc-name ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(doc.name)}" placeholder="Nama dokumen..."></td>
+          <td class="py-1 px-2 border-r"><input type="text" data-idx="${idx}" class="doc-note ui-input w-full px-2 py-1 rounded border text-xs" value="${escapeHtml(doc.note)}" placeholder="Lokasi / keterangan link..."></td>
+          <td class="py-1 px-1 text-center no-print"><button data-idx="${idx}" class="btn-del-doc text-stone-400 hover:text-rose-600 font-mono text-sm px-1">×</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderHistory(filter = '') {
+      const c = document.getElementById('historyListContainer');
+      c.innerHTML = '';
+      const q = filter.toLowerCase().trim();
+      const list = meetings.filter(m => !q || (m.agenda && m.agenda.toLowerCase().includes(q)) || (m.unit && m.unit.toLowerCase().includes(q)) || (m.date && m.date.toLowerCase().includes(q)));
+
+      if (list.length === 0) {
+        c.innerHTML = `<div class="p-6 text-center text-xs opacity-40 font-mono">Arsip kosong atau tidak ditemukan.</div>`;
+        return;
+      }
+
+      list.forEach(m => {
+        const isCur = m.id === currentId;
+        const item = document.createElement('div');
+        item.className = `p-3 rounded border cursor-pointer transition-colors ${isCur ? 'ui-subtle border-stone-500 font-medium' : 'ui-surface hover:border-stone-400'}`;
+        item.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex-1 min-w-0 btn-switch-doc" data-id="${m.id}">
+              <div class="text-xs truncate font-mono">${escapeHtml(m.agenda || 'Tanpa Agenda')}</div>
+              <div class="text-[11px] opacity-60 truncate mt-0.5">${escapeHtml(m.unit || 'Unit Umum')}</div>
+              <div class="text-[10px] font-mono opacity-40 mt-1.5">📅 ${escapeHtml(m.date || '-')}</div>
+            </div>
+            <button data-id="${m.id}" class="btn-delete-doc p-1 text-stone-400 hover:text-rose-600 opacity-60 hover:opacity-100" title="Hapus Berkas">
+              <svg class="w-3.5 h-3.5 stroke-[1.75]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
+        `;
+        c.appendChild(item);
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = text;
+      toast.classList.remove('translate-y-10', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-10', 'opacity-0');
+      }, 1800);
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(THEME_KEY, theme);
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.className = btn.getAttribute('data-theme-val') === theme ?
+          'theme-btn px-2.5 py-1 rounded text-xs font-semibold ui-surface shadow-xs' :
+          'theme-btn px-2.5 py-1 rounded text-xs font-medium opacity-60 hover:opacity-100';
+      });
+    }
+
+    function attachEvents() {
+      ['inpUnit', 'inpDate', 'inpTime', 'inpMedia', 'inpAgenda', 'inpLead', 'inpNotetaker', 'inpPrevRef', 'inpIssues'].forEach(id => {
+        document.getElementById(id).addEventListener('input', (e) => {
+          const k = id.replace('inp', '');
+          const key = k.charAt(0).toLowerCase() + k.slice(1);
+          cur()[key] = e.target.value;
+          cur().updatedAt = Date.now();
+          save();
+        });
+      });
+
+      document.getElementById('pickerDate').addEventListener('change', (e) => {
+        if (!e.target.value) return;
+        const selected = new Date(e.target.value + 'T00:00:00');
+        const formatted = formatIndonesianDate(selected);
+        document.getElementById('inpDate').value = formatted;
+        cur().date = formatted;
+        cur().dateIso = e.target.value;
+        save();
+      });
+
+      document.getElementById('btnDateToday').addEventListener('click', () => {
+        const today = new Date();
+        const iso = today.toISOString().split('T')[0];
+        const formatted = formatIndonesianDate(today);
+        document.getElementById('pickerDate').value = iso;
+        document.getElementById('inpDate').value = formatted;
+        cur().date = formatted;
+        cur().dateIso = iso;
+        save();
+        showToast('Tanggal sinkron ke hari ini');
+      });
+
+      ['timeStart', 'timeEnd', 'timeZone'].forEach(id => {
+        document.getElementById(id).addEventListener('change', updateCombinedTime);
+        document.getElementById(id).addEventListener('input', updateCombinedTime);
+      });
+
+      document.querySelectorAll('.btn-quick-dur').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const addMinutes = parseInt(btn.getAttribute('data-dur'));
+          const startVal = document.getElementById('timeStart').value || '09:00';
+          const [sh, sm] = startVal.split(':').map(Number);
+          const startDate = new Date();
+          startDate.setHours(sh, sm, 0, 0);
+
+          const endDate = new Date(startDate.getTime() + addMinutes * 60000);
+          const endHours = String(endDate.getHours()).padStart(2, '0');
+          const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
+
+          document.getElementById('timeEnd').value = `${endHours}:${endMinutes}`;
+          updateCombinedTime();
+          showToast(`Durasi disesuaikan (+${addMinutes}m)`);
+        });
+      });
+
+      document.querySelectorAll('input[name="jenisRapat"]').forEach(r => {
+        r.addEventListener('change', (e) => {
+          cur().jenisRapat = e.target.value;
+          save();
+        });
+      });
+      document.querySelectorAll('input[name="prevMeeting"]').forEach(r => {
+        r.addEventListener('change', (e) => {
+          cur().prevMeeting = e.target.value;
+          save();
+        });
+      });
+
+      ['signLeadName', 'signLeadRole', 'signLeadDate', 'signNoteName', 'signNoteRole', 'signNoteDate'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+          if (!cur().signLead) cur().signLead = {};
+          if (!cur().signNote) cur().signNote = {};
+          cur().signLead.name = document.getElementById('signLeadName').value;
+          cur().signLead.role = document.getElementById('signLeadRole').value;
+          cur().signLead.date = document.getElementById('signLeadDate').value;
+          cur().signNote.name = document.getElementById('signNoteName').value;
+          cur().signNote.role = document.getElementById('signNoteRole').value;
+          cur().signNote.date = document.getElementById('signNoteDate').value;
+          save();
+        });
+      });
+
+      document.getElementById('btnAddParticipant').addEventListener('click', () => {
+        if (!cur().participants) cur().participants = [];
+        cur().participants.push({ nama: '', jabatan: '', status: 'Hadir' });
+        renderParticipantsTable(); save();
+      });
+
+      document.getElementById('btnAddTopic').addEventListener('click', () => {
+        if (!cur().topics) cur().topics = [];
+        cur().topics.push({ issue: '', detail: '' });
+        renderTopicsTable(); save();
+      });
+
+      document.getElementById('btnAddDecision').addEventListener('click', () => {
+        if (!cur().decisions) cur().decisions = [];
+        cur().decisions.push('');
+        renderDecisionsTable(); save();
+      });
+
+      document.getElementById('btnAddAction').addEventListener('click', () => {
+        if (!cur().actions) cur().actions = [];
+        cur().actions.push({ task: '', pic: '', target: '', status: 'Belum Mulai', ref: '' });
+        renderActionsTable(); save();
+      });
+
+      document.getElementById('btnAddDoc').addEventListener('click', () => {
+        if (!cur().documents) cur().documents = [];
+        cur().documents.push({ name: '', note: '' });
+        renderDocsTable(); save();
+      });
+
+      document.addEventListener('input', (e) => {
+        const idx = e.target.getAttribute('data-idx');
+        if (idx === null) return;
+        const i = parseInt(idx);
+
+        if (e.target.classList.contains('part-name')) cur().participants[i].nama = e.target.value;
+        if (e.target.classList.contains('part-role')) cur().participants[i].jabatan = e.target.value;
+        if (e.target.classList.contains('part-status')) cur().participants[i].status = e.target.value;
+
+        if (e.target.classList.contains('topic-issue')) cur().topics[i].issue = e.target.value;
+        if (e.target.classList.contains('topic-detail')) cur().topics[i].detail = e.target.value;
+
+        if (e.target.classList.contains('dec-text')) cur().decisions[i] = e.target.value;
+
+        if (e.target.classList.contains('act-task')) cur().actions[i].task = e.target.value;
+        if (e.target.classList.contains('act-pic')) cur().actions[i].pic = e.target.value;
+        if (e.target.classList.contains('act-target')) cur().actions[i].target = e.target.value;
+        if (e.target.classList.contains('act-ref')) cur().actions[i].ref = e.target.value;
+
+        if (e.target.classList.contains('doc-name')) cur().documents[i].name = e.target.value;
+        if (e.target.classList.contains('doc-note')) cur().documents[i].note = e.target.value;
+
+        save();
+      });
+
+      document.addEventListener('change', (e) => {
+        if (e.target.classList.contains('act-status')) {
+          const idx = parseInt(e.target.getAttribute('data-idx'));
+          cur().actions[idx].status = e.target.value;
+          renderActionsTable();
+          save();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        const btn = e.target;
+        if (btn.classList.contains('btn-del-part')) {
+          cur().participants.splice(parseInt(btn.getAttribute('data-idx')), 1);
+          renderParticipantsTable(); save();
+        }
+        if (btn.classList.contains('btn-del-topic')) {
+          cur().topics.splice(parseInt(btn.getAttribute('data-idx')), 1);
+          renderTopicsTable(); save();
+        }
+        if (btn.classList.contains('btn-del-dec')) {
+          cur().decisions.splice(parseInt(btn.getAttribute('data-idx')), 1);
+          renderDecisionsTable(); save();
+        }
+        if (btn.classList.contains('btn-del-act')) {
+          cur().actions.splice(parseInt(btn.getAttribute('data-idx')), 1);
+          renderActionsTable(); save();
+        }
+        if (btn.classList.contains('btn-del-doc')) {
+          cur().documents.splice(parseInt(btn.getAttribute('data-idx')), 1);
+          renderDocsTable(); save();
+        }
+      });
+    }
+
+    function setupUI() {
+      const drawer = document.getElementById('historyDrawer');
+      const overlay = document.getElementById('drawerOverlay');
+
+      const openDrawer = () => {
+        renderHistory(document.getElementById('inpSearchHistory').value);
+        overlay.classList.remove('hidden');
+        setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
+      };
+      const closeDrawer = () => {
+        drawer.classList.add('translate-x-full');
+        setTimeout(() => overlay.classList.add('hidden'), 200);
+      };
+
+      document.getElementById('btnOpenHistory').addEventListener('click', openDrawer);
+      document.getElementById('btnCloseDrawer').addEventListener('click', closeDrawer);
+      overlay.addEventListener('click', closeDrawer);
+
+      document.getElementById('inpSearchHistory').addEventListener('input', (e) => {
+        renderHistory(e.target.value);
+      });
+
+      document.addEventListener('click', (e) => {
+        const sw = e.target.closest('.btn-switch-doc');
+        if (sw) {
+          currentId = sw.getAttribute('data-id');
+          save();
+          render();
+          closeDrawer();
+          showToast('Dokumen dibuka');
+        }
+        const del = e.target.closest('.btn-delete-doc');
+        if (del) {
+          const id = del.getAttribute('data-id');
+          if (meetings.length <= 1) {
+            alert('Minimal harus ada 1 dokumen.');
+            return;
+          }
+          if (confirm('Hapus dokumen notulensi ini?')) {
+            meetings = meetings.filter(m => m.id !== id);
+            if (currentId === id) currentId = meetings[0].id;
+            save();
+            render();
+            renderHistory(document.getElementById('inpSearchHistory').value);
+            showToast('Dokumen dihapus');
+          }
+        }
+      });
+
+      const newMeeting = () => {
+        const doc = createBlankNotulensi();
+        meetings.unshift(doc);
+        currentId = doc.id;
+        save();
+        render();
+        closeDrawer();
+        showToast('Dokumen baru disiapkan');
+      };
+      document.getElementById('btnNewMeeting').addEventListener('click', newMeeting);
+      document.getElementById('btnDrawerNew').addEventListener('click', newMeeting);
+
+      document.getElementById('btnDuplicateCurrent').addEventListener('click', () => {
+        const copy = JSON.parse(JSON.stringify(cur()));
+        copy.id = 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+        copy.agenda = (copy.agenda || 'Notulen') + ' (Salinan)';
+        meetings.unshift(copy);
+        currentId = copy.id;
+        save();
+        render();
+        showToast('Dokumen diduplikat');
+      });
+
+      document.getElementById('btnCopyWA').addEventListener('click', async () => {
+        const d = cur();
+        let txt = `📄 *FORMULIR NOTULENSI RAPAT*\n`;
+        txt += `━━━━━━━━━━━━━━━━━━━━━\n`;
+        txt += `*A. IDENTITAS RAPAT*\n`;
+        txt += `• Unit/Bagian: ${d.unit || '-'}\n`;
+        txt += `• Hari/Tanggal: ${d.date || '-'}\n`;
+        txt += `• Waktu: ${d.time || '-'}\n`;
+        txt += `• Tempat/Media: ${d.media || '-'}\n`;
+        txt += `• Agenda/Tujuan: ${d.agenda || '-'}\n`;
+        txt += `• Pimpinan: ${d.lead || '-'}\n`;
+        txt += `• Notulis: ${d.notetaker || '-'}\n`;
+        txt += `• Jenis Rapat: ${d.jenisRapat || 'Rutin'}\n\n`;
+
+        if (d.participants && d.participants.some(p => p.nama)) {
+          txt += `*B. PESERTA RAPAT*\n`;
+          d.participants.filter(p => p.nama).forEach((p, i) => {
+            txt += `${i + 1}. ${p.nama} (${p.jabatan || '-'}) — [${p.status || 'Hadir'}]\n`;
+          });
+          txt += `\n`;
+        }
+
+        if (d.topics && d.topics.some(t => t.issue)) {
+          txt += `*C. POKOK PEMBAHASAN*\n`;
+          d.topics.filter(t => t.issue).forEach((t, i) => {
+            txt += `${i + 1}. *${t.issue}*\n   ${t.detail || '-'}\n`;
+          });
+          txt += `\n`;
+        }
+
+        if (d.decisions && d.decisions.some(dec => dec.trim())) {
+          txt += `*D. KEPUTUSAN / KESEPAKATAN*\n`;
+          d.decisions.filter(dec => dec.trim()).forEach((dec, i) => {
+            txt += `${i + 1}. ${dec}\n`;
+          });
+          txt += `\n`;
+        }
+
+        if (d.actions && d.actions.some(a => a.task)) {
+          txt += `*E. TINDAK LANJUT / ACTION PLAN*\n`;
+          d.actions.filter(a => a.task).forEach((a, i) => {
+            txt += `${i + 1}. [${a.status || 'Belum Mulai'}] ${a.task} | PIC: ${a.pic || '-'} | Target: ${a.target || '-'}\n`;
+          });
+          txt += `\n`;
+        }
+
+        if (d.issues) {
+          txt += `*F. ISU / RISIKO / HAMBATAN*\n${d.issues}\n\n`;
+        }
+
+        txt += `*H. PENGESAHAN*\n`;
+        txt += `• Pimpinan: ${d.signLead ? d.signLead.name || '-' : '-'}\n`;
+        txt += `• Notulis: ${d.signNote ? d.signNote.name || '-' : '-'}\n`;
+        txt += `━━━━━━━━━━━━━━━━━━━━━\n_DOKUMEN TERKENDALI_`;
+
+        try {
+          await navigator.clipboard.writeText(txt);
+          showToast('Teks disalin ke WA!');
+        } catch (e) {
+          const ta = document.createElement('textarea');
+          ta.value = txt; document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta);
+          showToast('Teks disalin ke WA!');
+        }
+      });
+
+      document.getElementById('btnPrintPDF').addEventListener('click', () => window.print());
+
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => setTheme(btn.getAttribute('data-theme-val')));
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      init();
+      attachEvents();
+      setupUI();
+    });
+  </script>
+</body>
+</html>
